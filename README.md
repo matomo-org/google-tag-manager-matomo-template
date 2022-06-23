@@ -27,3 +27,5 @@ Or in short:
 6. Set the "idSite" and rest of the config as per your choice.
 7. Add a Triggering event, eg "All pages (pageview)".
 8. Click on save and Matomo Tag is installed.
+
+**Note:** Currently this tag works for Matomo cloud instances only due to url(s) or url patterns need to be mentioned in advance while creating any custom tag.
