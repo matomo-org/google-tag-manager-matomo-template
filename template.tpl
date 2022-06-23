@@ -37,7 +37,12 @@ ___TEMPLATE_PARAMETERS___
     "simpleValueType": true,
     "valueHint": "https://yourmatomodomain.com",
     "notSetText": "Field is required",
-    "help": "The URL of your Matomo instance. It should not include \"/index.php\" or \"piwik.php\"."
+    "help": "The URL of your Matomo instance. It should not include \"/index.php\" or \"piwik.php\".",
+    "valueValidators": [
+      {
+        "type": "NON_EMPTY"
+      }
+    ]
   },
   {
     "type": "TEXT",
@@ -46,7 +51,12 @@ ___TEMPLATE_PARAMETERS___
     "simpleValueType": true,
     "valueHint": "1",
     "notSetText": "Field is required",
-    "help": "The idSite you want to track data into."
+    "help": "The idSite you want to track data into.",
+    "valueValidators": [
+      {
+        "type": "NON_EMPTY"
+      }
+    ]
   },
   {
     "type": "CHECKBOX",
