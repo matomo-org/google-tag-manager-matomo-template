@@ -13,7 +13,7 @@ ___INFO___
   "id": "cvt_temp_public_id",
   "version": 1,
   "securityGroups": [],
-  "displayName": "Matomo",
+  "displayName": "Matomo Tracking Tag for Matomo Cloud",
   "categories": ["ANALYTICS"],
   "brand": {
     "id": "brand_dummy",
@@ -31,16 +31,34 @@ ___TEMPLATE_PARAMETERS___
 
 [
   {
-    "type": "TEXT",
-    "name": "url",
-    "displayName": "Matomo URL",
+    "type": "SELECT",
+    "name": "matomoDomain",
+    "displayName": "Matomo Domain",
+    "selectItems": [
+      {
+        "value": ".matomo.cloud",
+        "displayValue": ".matomo.cloud"
+      },
+      {
+        "value": ".innocraft.cloud",
+        "displayValue": ".innocraft.cloud"
+      }
+    ],
     "simpleValueType": true,
-    "valueHint": "https://yourmatomodomain.com",
+    "help": "The domain on which your cloud is hosted, choose `.innocraft.cloud` if your cloud URL is `*.innocraft.cloud`"
+  },
+  {
+    "type": "TEXT",
+    "name": "matomoSubDomain",
+    "displayName": "Matomo Sub Domain",
+    "simpleValueType": true,
+    "valueHint": "web",
     "notSetText": "Field is required",
-    "help": "The URL of your Matomo instance. It should not include \"/index.php\" or \"piwik.php\".",
+    "help": "The subdomain of your Matomo Instance, only enter the subdomain, eg if your Matomo URL is \"https://web.inncoraft.cloud\" enter only web",
     "valueValidators": [
       {
-        "type": "NON_EMPTY"
+        "type": "NON_EMPTY",
+        "enablingConditions": []
       }
     ]
   },
@@ -321,9 +339,13 @@ const onFailure = () => {
   data.gtmOnFailure();
 };
 
-if (data.url && data.idSite) {
+if (data.matomoSubDomain && data.idSite) {
   const injectScript = require('injectScript');
-  const baseUrl = data.url + (data.url[data.url.length-1] !== '/' ? '/' :'');
+  let baseUrl = 'https://' + data.matomoSubDomain + data.matomoDomain  + '/';
+  
+  // if you want to test this on your local instance, uncomment the below line add your local instance url and add the same inside the permissions tab in inject scripts
+  // baseUrl='{YOURMATOMO_URL}';
+ 
   const url = baseUrl + data.jsEndpoint;
   log(url);
   const _paq = createQueue('_paq');
@@ -451,11 +473,19 @@ ___WEB_PERMISSIONS___
             "listItem": [
               {
                 "type": 1,
-                "string": "https://cdn.matomo.cloud/*/piwik.js https://cdn.matomo.cloud/*/matomo.js https://cdn.innocraft.cloud/*/piwik.js https://cdn.innocraft.cloud/*/matomo.js"
+                "string": "https://*.matomo.cloud/piwik.js"
               },
               {
                 "type": 1,
-                "string": "https://localhost.matomo.com/matomo.js"
+                "string": "https://*.matomo.cloud/matomo.js"
+              },
+              {
+                "type": 1,
+                "string": "https://*.innocraft.cloud/piwik.js"
+              },
+              {
+                "type": 1,
+                "string": "https://*.innocraft.cloud/matomo.js"
               }
             ]
           }
