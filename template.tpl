@@ -330,7 +330,6 @@ log('data =', data);
 
 const onSuccess = () => {
   log('Tracker.js loaded successfully');
-  const baseUrl = data.url + (data.url[data.url.length-1] !== '/' ? '/' :'');
   data.gtmOnSuccess();
 };
 
@@ -341,7 +340,7 @@ const onFailure = () => {
 
 if (data.matomoSubDomain && data.idSite) {
   const injectScript = require('injectScript');
-  let baseUrl = 'https://' + data.matomoSubDomain + data.matomoDomain  + '/';
+  let baseUrl = 'https://cdn.matomo.cloud/' + data.matomoSubDomain + data.matomoDomain  + '/';
   
   // if you want to test this on your local instance, uncomment the below line add your local instance url and add the same inside the permissions tab in inject scripts
   // baseUrl='{YOURMATOMO_URL}';
@@ -377,7 +376,7 @@ if (data.matomoSubDomain && data.idSite) {
   
   paqCustomDimensions(_paq);
   
-  log('injecting script' + url);
+  log('injecting script: ' + url);
   injectScript(url, onSuccess, onFailure, url);
 }
 
@@ -473,19 +472,19 @@ ___WEB_PERMISSIONS___
             "listItem": [
               {
                 "type": 1,
-                "string": "https://*.matomo.cloud/piwik.js"
+                "string": "https://cdn.matomo.cloud/*.matomo.cloud/piwik.js"
               },
               {
                 "type": 1,
-                "string": "https://*.matomo.cloud/matomo.js"
+                "string": "https://cdn.matomo.cloud/*.matomo.cloud/matomo.js"
               },
               {
                 "type": 1,
-                "string": "https://*.innocraft.cloud/piwik.js"
+                "string": "https://cdn.matomo.cloud/*.innocraft.cloud/piwik.js"
               },
               {
                 "type": 1,
-                "string": "https://*.innocraft.cloud/matomo.js"
+                "string": "https://cdn.matomo.cloud/*.innocraft.cloud/matomo.js"
               }
             ]
           }
@@ -563,7 +562,16 @@ ___WEB_PERMISSIONS___
 
 ___TESTS___
 
-scenarios: []
+scenarios:
+- name: should_load_matomo_js
+  code: |-
+    const mockData = {"enableBrowserFeatureDetection":false,"disableCrossDomainLinking":false,"trackingEndpoint":"matomo.php","disableCookies":false,"enableJSErrorTracking":false,"setSecureCookie":false,"trackAllContentImpressions":false,"requireCookieConsent":false,"enableDoNotTrack":false,"requireConsent":false,"doNotUseSendBeacon":false,"jsEndpoint":"matomo.js","idSite":"3","cookieSameSite":"Lax","disableTrackPageview":false,"disableLinkTracking":false,"matomoSubDomain":"web","trackVisibleContentImpressions":false,"matomoDomain":".innocraft.cloud","enableHeartBeatTimer":false};
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
 
 
 ___NOTES___
