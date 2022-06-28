@@ -31,34 +31,19 @@ ___TEMPLATE_PARAMETERS___
 
 [
   {
-    "type": "SELECT",
-    "name": "matomoDomain",
-    "displayName": "Matomo Domain",
-    "selectItems": [
-      {
-        "value": ".matomo.cloud",
-        "displayValue": ".matomo.cloud"
-      },
-      {
-        "value": ".innocraft.cloud",
-        "displayValue": ".innocraft.cloud"
-      }
-    ],
-    "simpleValueType": true,
-    "help": "The domain on which your cloud is hosted, choose `.innocraft.cloud` if your cloud URL is `*.innocraft.cloud`"
-  },
-  {
     "type": "TEXT",
-    "name": "matomoSubDomain",
-    "displayName": "Matomo Sub Domain",
+    "name": "matomoUrl",
+    "displayName": "Matomo URL",
     "simpleValueType": true,
-    "valueHint": "web",
+    "valueHint": "https://web.innocraft.cloud",
     "notSetText": "Field is required",
-    "help": "The subdomain of your Matomo Instance, only enter the subdomain, eg if your Matomo URL is \"https://web.inncoraft.cloud\" enter only web",
+    "help": "The URL of your Matomo Instance, Eg https://web.innocraft.cloud",
     "valueValidators": [
       {
-        "type": "NON_EMPTY",
-        "enablingConditions": []
+        "type": "REGEX",
+        "args": [
+          "https:\\/\\/.*\\.(innocraft|matomo)\\.cloud\\/?"
+        ]
       }
     ]
   },
@@ -73,6 +58,9 @@ ___TEMPLATE_PARAMETERS___
     "valueValidators": [
       {
         "type": "NON_EMPTY"
+      },
+      {
+        "type": "POSITIVE_NUMBER"
       }
     ]
   },
@@ -264,58 +252,6 @@ ___TEMPLATE_PARAMETERS___
     "newRowTitle": "Custom Dimension",
     "newRowButtonText": "Add Custom Dimension",
     "help": "Optionally set one or multiple custom dimensions."
-  },
-  {
-    "type": "SELECT",
-    "name": "jsEndpoint",
-    "displayName": "Tracker Javascript Path",
-    "macrosInSelect": false,
-    "selectItems": [
-      {
-        "value": "matomo.js",
-        "displayValue": "matomo.js"
-      },
-      {
-        "value": "piwik.js",
-        "displayValue": "piwik.js"
-      },
-      {
-        "value": "js/",
-        "displayValue": "js/"
-      },
-      {
-        "value": "js/tracker.php",
-        "displayValue": "js/tracker.php"
-      }
-    ],
-    "simpleValueType": true,
-    "help": "Here you can configure the source path of the Matomo Tracker JavaScript, if you are not using the \"Bundle Tracker\" option.  Default: matomo.js"
-  },
-  {
-    "type": "SELECT",
-    "name": "trackingEndpoint",
-    "displayName": "Tracking Request Target Path",
-    "macrosInSelect": false,
-    "selectItems": [
-      {
-        "value": "matomo.php",
-        "displayValue": "matomo.php"
-      },
-      {
-        "value": "piwik.php",
-        "displayValue": "piwik.php"
-      },
-      {
-        "value": "js/",
-        "displayValue": "js/"
-      },
-      {
-        "value": "js/tracker.php",
-        "displayValue": "js/tracker.php"
-      }
-    ],
-    "simpleValueType": true,
-    "help": "Here you can configure the target path for tracking requests.  Default: matomo.php"
   }
 ]
 
@@ -323,66 +259,87 @@ ___TEMPLATE_PARAMETERS___
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 // Enter your template code here.
-const log = require('logToConsole');
-const createQueue = require('createQueue');
-const injectScript = require('injectScript');
+var log = require('logToConsole');
+var createQueue = require('createQueue');
+var injectScript = require('injectScript');
 log('data =', data);
 
-const onSuccess = () => {
+var onSuccess = () => {
   log('Tracker.js loaded successfully');
   data.gtmOnSuccess();
 };
 
-const onFailure = () => {
+var onFailure = () => {
   log('Tracker.js loading failed');
   data.gtmOnFailure();
 };
 
-if (data.matomoSubDomain && data.idSite) {
-  const injectScript = require('injectScript');
-  let baseUrl = 'https://cdn.matomo.cloud/' + data.matomoSubDomain + data.matomoDomain  + '/';
+if (data.matomoUrl && data.idSite) {
+  parseMatomoUrl();
+  log('data =', data);
   
-  // if you want to test this on your local instance, uncomment the below line add your local instance url and add the same inside the permissions tab in inject scripts
-  // baseUrl='{YOURMATOMO_URL}';
+  var trackingJSURL = 'https://' + data.cdnDomain + '/' + data.subDomain  + data.matomoDomain  + '/matomo.js';
+  
+  // if you want to test this on your local instance, uncomment the below lines add your local instance url and add the same inside the permissions tab in inject scripts
+  //data.matomoUrl = '{YOUR_MATOMO_DOMAIN_URL}';
+  //trackingJSURL = '{YOUR_MATOMO_JS_URL}';
  
-  const url = baseUrl + data.jsEndpoint;
-  log(url);
-  const _paq = createQueue('_paq');
-  _paq(['setSiteId',data.idSite]);
-  _paq(['setTrackerUrl',baseUrl + data.trackingEndpoint]);
+  log(trackingJSURL);
+  var _paq = createQueue('_paq');
   
-  let disableConfigValues = {'disableTrackPageview':'trackPageView', 'disableLinkTracking':'enableLinkTracking', 'disableCrossDomainLinking':'enableCrossDomainLinking'};
-  paqDisable(_paq, disableConfigValues);
-  
-  let enableConfigValues = {'enableDoNotTrack':'setDoNotTrack', 'enableJSErrorTracking':'enableJSErrorTracking', 'enableHeartBeatTimer':'enableHeartBeatTimer','trackAllContentImpressions':'trackAllContentImpressions', 'trackVisibleContentImpressions':'trackVisibleContentImpressions','disableCookies':'disableCookies','requireConsent':'requireConsent', 'requireCookieConsent':'requireCookieConsent','setSecureCookie':'setSecureCookie'};
+  var enableConfigValues = {'requireCookieConsent':'requireCookieConsent'};
   paqEnable(_paq, enableConfigValues);
   
-  let configWithValues = {'cookieDomain':'setCookieDomain','cookiePath':'setCookiePath','cookieSameSite':'setCookieSameSite'};
-  paqValue(_paq, configWithValues);
-  
-  disableConfigValues = {'enableBrowserFeatureDetection':'disableBrowserFeatureDetection'};
+  var disableConfigValues = {'enableBrowserFeatureDetection':'disableBrowserFeatureDetection'};
   paqDisable(_paq, disableConfigValues);
   
-  const domains = getDomains();
+  enableConfigValues = {'disableCookies':'disableCookies'};
+  paqEnable(_paq, enableConfigValues);
+  
+  _paq(['setTrackerUrl',data.matomoUrl + 'matomo.php']);
+  
+  disableConfigValues = {'disableCrossDomainLinking':'enableCrossDomainLinking'};
+  paqDisable(_paq, disableConfigValues);
+  
+  var configWithValues = {'cookieSameSite':'setCookieSameSite','setSecureCookie':'setSecureCookie','cookiePath':'setCookiePath','cookieDomain':'setCookieDomain'};
+  paqValue(_paq, configWithValues);
+  
+  var domains = getDomains();
   if (domains.length) {
     _paq("setDomains",domains);
   }
   
-  disableConfigValues = {'doNotUseSendBeacon':'alwaysUseSendBeacon'};
-  paqDisable(_paq, disableConfigValues);
-  
   configWithValues = {'userId':'setUserId'};
   paqValue(_paq, configWithValues);
   
+  _paq(['setSiteId',data.idSite]);
+  
+  disableConfigValues = {'disableLinkTracking':'enableLinkTracking'};
+  paqDisable(_paq, disableConfigValues);
+  
+  enableConfigValues = {'requireConsent':'requireConsent'};
+  paqEnable(_paq, enableConfigValues);
+  
+  disableConfigValues = {'disableTrackPageview':'trackPageView'};
+  paqDisable(_paq, disableConfigValues);
+  
+  enableConfigValues = {'enableDoNotTrack':'setDoNotTrack', 'enableJSErrorTracking':'enableJSErrorTracking', 'enableHeartBeatTimer':'enableHeartBeatTimer','trackAllContentImpressions':'trackAllContentImpressions', 'trackVisibleContentImpressions':'trackVisibleContentImpressions'};
+  paqEnable(_paq, enableConfigValues);
+  
+  
+  disableConfigValues = {'doNotUseSendBeacon':'alwaysUseSendBeacon'};
+  paqDisable(_paq, disableConfigValues);
+  
+  
   paqCustomDimensions(_paq);
   
-  log('injecting script: ' + url);
-  injectScript(url, onSuccess, onFailure, url);
+  log('injecting script: ' + trackingJSURL);
+  injectScript(trackingJSURL, onSuccess, onFailure, trackingJSURL);
 }
 
 function paqDisable(_paq, values)
 {
-  for(let key in values) {
+  for(var key in values) {
     if (!data[key]) {
       _paq([values[key]]);
     }
@@ -392,7 +349,7 @@ function paqDisable(_paq, values)
 
 function paqEnable(_paq, values)
 {
-  for(let key in values) {
+  for(var key in values) {
     if (data[key]) {
       _paq([values[key], true]);
     }
@@ -401,7 +358,7 @@ function paqEnable(_paq, values)
 
 function paqValue(_paq, values)
 {
-  for(let key in values) {
+  for(var key in values) {
     if (data[key]) {
       _paq([values[key], data[key]]);
     }
@@ -410,9 +367,9 @@ function paqValue(_paq, values)
 
 function getDomains()
 {
-  let domains = [];
+  var domains = [];
   if (data.domains) {
-    for (let i=0;i<data.domains.length;i++) {
+    for (var i=0;i<data.domains.length;i++) {
       if(data.domains[i].domain) {
         domains.push(data.domains[i].domain);
       }
@@ -425,11 +382,31 @@ function getDomains()
 function paqCustomDimensions(_paq)
 {
   if (data.customDimensions) {
-    for (let i=0;i<data.customDimensions.length;i++) {
+    for (var i=0;i<data.customDimensions.length;i++) {
       if(data.customDimensions[i].index) {
         _paq(["setCustomDimension",data.customDimensions[i].index,data.customDimensions[i].value]);
       }
     }
+  }
+}
+
+function parseMatomoUrl() {
+  if (data.matomoUrl[data.matomoUrl.length - 1] !== '/') {
+    data.matomoUrl+='/';
+  }
+  var url = data.matomoUrl;
+  data.protocol = 'https';
+  url = url.replace('https://', '');
+  url = url.slice(0, -1);
+  
+  if (url.indexOf('.innocraft.cloud') > 0) {
+    data.cdnDomain = 'cdn.innocraft.cloud';
+    data.matomoDomain = '.innocraft.cloud';
+    data.subDomain = url.replace('.innocraft.cloud', '');
+  } else {
+    data.cdnDomain = 'cdn.matomo.cloud';
+    data.matomoDomain = '.matomo.cloud';
+    data.subDomain = url.replace('.matomo.cloud', '');
   }
 }
 
@@ -472,19 +449,11 @@ ___WEB_PERMISSIONS___
             "listItem": [
               {
                 "type": 1,
-                "string": "https://cdn.matomo.cloud/*.matomo.cloud/piwik.js"
-              },
-              {
-                "type": 1,
                 "string": "https://cdn.matomo.cloud/*.matomo.cloud/matomo.js"
               },
               {
                 "type": 1,
-                "string": "https://cdn.matomo.cloud/*.innocraft.cloud/piwik.js"
-              },
-              {
-                "type": 1,
-                "string": "https://cdn.matomo.cloud/*.innocraft.cloud/matomo.js"
+                "string": "https://cdn.innocraft.cloud/*.innocraft.cloud/matomo.js"
               }
             ]
           }
@@ -565,7 +534,7 @@ ___TESTS___
 scenarios:
 - name: should_load_matomo_js
   code: |-
-    const mockData = {"enableBrowserFeatureDetection":false,"disableCrossDomainLinking":false,"trackingEndpoint":"matomo.php","disableCookies":false,"enableJSErrorTracking":false,"setSecureCookie":false,"trackAllContentImpressions":false,"requireCookieConsent":false,"enableDoNotTrack":false,"requireConsent":false,"doNotUseSendBeacon":false,"jsEndpoint":"matomo.js","idSite":"3","cookieSameSite":"Lax","disableTrackPageview":false,"disableLinkTracking":false,"matomoSubDomain":"web","trackVisibleContentImpressions":false,"matomoDomain":".innocraft.cloud","enableHeartBeatTimer":false};
+    const mockData = {"enableBrowserFeatureDetection":false,"disableCrossDomainLinking":false,"trackingEndpoint":"matomo.php","disableCookies":false,"enableJSErrorTracking":false,"setSecureCookie":false,"trackAllContentImpressions":false,"requireCookieConsent":false,"enableDoNotTrack":false,"requireConsent":false,"doNotUseSendBeacon":false,"jsEndpoint":"matomo.js","idSite":"3","cookieSameSite":"Lax","disableTrackPageview":false,"disableLinkTracking":false,"trackVisibleContentImpressions":false,"enableHeartBeatTimer":false,"matomoUrl":"https://web.innocraft.cloud"};
 
     // Call runCode to run the template's code.
     runCode(mockData);
