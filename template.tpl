@@ -264,12 +264,12 @@ var createQueue = require('createQueue');
 var injectScript = require('injectScript');
 log('data =', data);
 
-var onSuccess = () => {
+var onSuccess = function() {
   log('Tracker.js loaded successfully');
   data.gtmOnSuccess();
 };
 
-var onFailure = () => {
+var onFailure = function() {
   log('Tracker.js loading failed');
   data.gtmOnFailure();
 };
