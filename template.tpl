@@ -320,9 +320,6 @@ if (data.matomoUrl && data.idSite) {
   enableConfigValues = {'requireConsent':'requireConsent'};
   paqEnable(_paq, enableConfigValues);
   
-  disableConfigValues = {'disableTrackPageview':'trackPageView'};
-  paqDisable(_paq, disableConfigValues);
-  
   enableConfigValues = {'enableDoNotTrack':'setDoNotTrack', 'enableJSErrorTracking':'enableJSErrorTracking', 'enableHeartBeatTimer':'enableHeartBeatTimer','trackAllContentImpressions':'trackAllContentImpressions', 'trackVisibleContentImpressions':'trackVisibleContentImpressions'};
   paqEnable(_paq, enableConfigValues);
   
@@ -332,6 +329,9 @@ if (data.matomoUrl && data.idSite) {
   
   
   paqCustomDimensions(_paq);
+  
+  disableConfigValues = {'disableTrackPageview':'trackPageView'};
+  paqDisable(_paq, disableConfigValues);
   
   log('injecting script: ' + trackingJSURL);
   injectScript(trackingJSURL, onSuccess, onFailure, trackingJSURL);
