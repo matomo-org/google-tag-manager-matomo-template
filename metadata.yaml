@@ -1,5 +1,5 @@
 homepage: "https://matomo.org/"
 documentation: "https://github.com/matomo-org/google-tag-manager-matomo-template"
 versions:
-  - sha: 43e6310163e2bef9f321b768de0c5f361716d659
+  - sha: e71bc0b9349074685da0925bc8f9e6657e01e5e4
     changeNotes: Initial Release.
