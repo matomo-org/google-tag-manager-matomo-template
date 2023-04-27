@@ -35,3 +35,7 @@ Or in short:
 14. Publish your changes by clicking the “Submit” button and then the “Publish” button at the top right.
 
 **Note:** Currently this tag works for Matomo cloud instances only due to url(s) or url patterns need to be mentioned in advance while creating any custom tag.
+
+## Installation Guide
+
+You can refer to this [guide](https://matomo.org/faq/new-to-piwik/how-do-i-use-matomo-analytics-within-gtm-google-tag-manager/) to setup Matomo tracking using Google Tag Manager.
