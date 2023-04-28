@@ -20,12 +20,22 @@ Or in short:
 ## Installation Steps
 
 1. Login to your GoogleTagManager Account.
-2. Select appropriate container.
-3. Click on "Tags" from left menu.
-4. Click on "New" button and search for "Matomo" in Tag Configuration.
-5. Set the Matomo Domain URL, eg "https://cdn.matomo.cloud/example.com/"
-6. Set the "idSite" and rest of the config as per your choice.
-7. Add a Triggering event, eg "All pages (pageview)".
-8. Click on save and Matomo Tag is installed.
+2. Select the container that you want to add Matomo to.
+3. Click “Tags” from the left menu.
+4. Click the “New” button at the top right corner of the tags section to add a new tag.
+5. Click on “Tag Configuration” to select the tag.
+6. A window with all the available tags will pop up.
+7. In the search bar, search for “Matomo Tracking Tag for Matomo Cloud” and select the tag.
+8. Configure the tag by specifying the Matomo URL and Matomo IdSite. 
+9. Scroll down and click on “Triggering”. 
+10. Select “All Pages” to fire the Matomo tracking tag on all of your pages.
+11. Click “Save”.
+12. Preview your changes by clicking the “Preview” button.
+13. Check if the Matomo tag is firing as expected.
+14. Publish your changes by clicking the “Submit” button and then the “Publish” button at the top right.
 
-**Note:** Currently this tag works for Matomo cloud instances only due to url(s) or url patterns need to be mentioned in advance while creating any custom tag.
+**Note:** This tag is only compatible with Matomo cloud instances, as URL(s) or URL patterns need to be specified in advance when creating any custom tags.
+
+## Installation Guide
+
+You can refer to this [guide](https://matomo.org/faq/new-to-piwik/how-do-i-use-matomo-analytics-within-gtm-google-tag-manager/) to setup Matomo tracking using Google Tag Manager.
