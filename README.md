@@ -34,7 +34,7 @@ Or in short:
 13. Check if the Matomo tag is firing as expected.
 14. Publish your changes by clicking the “Submit” button and then the “Publish” button at the top right.
 
-**Note:** Currently this tag works for Matomo cloud instances only due to url(s) or url patterns need to be mentioned in advance while creating any custom tag.
+**Note:** This tag is only compatible with Matomo cloud instances, as URL(s) or URL patterns need to be specified in advance when creating any custom tags.
 
 ## Installation Guide
 
