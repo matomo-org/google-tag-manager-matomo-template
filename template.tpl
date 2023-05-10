@@ -306,7 +306,7 @@ if (data.matomoUrl && data.idSite) {
   
   var domains = getDomains();
   if (domains.length) {
-    _paq("setDomains",domains);
+    _paq(["setDomains",domains]);
   }
   
   configWithValues = {'userId':'setUserId'};
