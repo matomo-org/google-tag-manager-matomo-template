@@ -191,6 +191,13 @@ ___TEMPLATE_PARAMETERS___
     "help": "By default, Matomo accesses some information from the visitor’s browser like the browser resolution. Some privacy regulations may allow access of such information from the visitor’s device only after having a consent. If this applies to you, you can disable this feature.\n\nTo learn more, check this https://matomo.org/faq/how-to/how-do-i-disable-browser-feature-detection-completely/."
   },
   {
+    "type": "CHECKBOX",
+    "name": "requireConsentForCampaignTracking",
+    "checkboxText": "Require consent to track campaign parameters",
+    "simpleValueType": true,
+    "help": "By enabling the consent requirement, Matomo will track campaign parameters only for users who have provided their consent. This approach ensures that data collection respects users\u0027 preferences while enabling the analysis of traffic segmentation by key metrics like source, medium, and campaign specifics."
+  },
+  {
     "type": "PARAM_TABLE",
     "name": "domains",
     "displayName": "Domains",
@@ -292,7 +299,11 @@ if (data.matomoUrl && data.idSite) {
   
   var disableConfigValues = {'enableBrowserFeatureDetection':'disableBrowserFeatureDetection'};
   paqDisable(_paq, disableConfigValues);
-  
+
+  if (data.requireConsentForCampaignTracking) {
+    _paq(['disableCampaignParameters']);
+  }
+
   enableConfigValues = {'disableCookies':'disableCookies'};
   paqEnable(_paq, enableConfigValues);
   
@@ -534,7 +545,7 @@ ___TESTS___
 scenarios:
 - name: should_load_matomo_js
   code: |-
-    const mockData = {"enableBrowserFeatureDetection":false,"disableCrossDomainLinking":false,"trackingEndpoint":"matomo.php","disableCookies":false,"enableJSErrorTracking":false,"setSecureCookie":false,"trackAllContentImpressions":false,"requireCookieConsent":false,"enableDoNotTrack":false,"requireConsent":false,"doNotUseSendBeacon":false,"jsEndpoint":"matomo.js","idSite":"3","cookieSameSite":"Lax","disableTrackPageview":false,"disableLinkTracking":false,"trackVisibleContentImpressions":false,"enableHeartBeatTimer":false,"matomoUrl":"https://web.innocraft.cloud"};
+    const mockData = {"enableBrowserFeatureDetection":false,"requireConsentForCampaignTracking":false,"disableCrossDomainLinking":false,"trackingEndpoint":"matomo.php","disableCookies":false,"enableJSErrorTracking":false,"setSecureCookie":false,"trackAllContentImpressions":false,"requireCookieConsent":false,"enableDoNotTrack":false,"requireConsent":false,"doNotUseSendBeacon":false,"jsEndpoint":"matomo.js","idSite":"3","cookieSameSite":"Lax","disableTrackPageview":false,"disableLinkTracking":false,"trackVisibleContentImpressions":false,"enableHeartBeatTimer":false,"matomoUrl":"https://web.innocraft.cloud"};
 
     // Call runCode to run the template's code.
     runCode(mockData);
